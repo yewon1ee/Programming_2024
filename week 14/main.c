@@ -121,12 +121,31 @@ void checkDie(void)
 // ----- EX. 6 : game end ------------
 int getAlivePlayer(void)
 {
-   
+   int i;
+		int cnt = 0;
+		for (i=0; i<N_PLAYER; i++)
+		{
+			if (player_status[i] == PLAYERSTATUS_END)
+				cnt++;
+		}
+		return cnt;
 }
 
 int getWinner(void)
 {
-    
+    int i;
+		int winner = 0;
+		int max_coin = -1;
+
+		for (i=0; i<N_PLAYER; i++)
+		{
+			if (player_coin[i] > max_coin)
+			{
+				max_coin = player_coin[i];
+				winner = i;
+			}
+		}
+		return winner;
 }
 // ----- EX. 6 : game end ------------
 
@@ -176,6 +195,9 @@ int main(int argc, const char * argv[]) {
 // ----- EX. 3 : board ------------
         board_printBoardStatus();
 // ----- EX. 3 : board ------------
+        for (i=0;i<N_PLAYER;i++) {
+        	printPlayerPosition(i);
+		}
 // ----- EX. 4 : player ------------
         printPlayerStatus();
 // ----- EX. 4 : player ------------
@@ -188,15 +210,40 @@ int main(int argc, const char * argv[]) {
         fflush(stdin);
 // ----- EX. 4 : player ------------
         dieResult = rolldie();
+       
         
         
         //step 2-3. moving
-   
+         player_position[turn]+=dieResult;
+         printf("Die result: %i, %s moved to %i\n",dieResult,player_name[turn],player_position[turn]);
+         if (player_position[turn] >= N_BOARD)
+		{
+			player_position[turn] = N_BOARD-1;
+		}
+		if (player_position[turn] == N_BOARD-1)
+			player_status[turn] = PLAYERSTATUS_END;
         //step 2-4. coin
-    
+        int pos = player_position[turn];
+        coinResult = board_getBoardCoin(pos);
+	     player_coin[turn]+=coinResult;
+	     if(coinResult!=0)
+		 {
+	    	printf("-> Lucky! a got %i coins\n", coinResult);
+	   	}
+        
         
         //step 2-5. end process
-    
+   
+    	turn=(turn+1)%N_PLAYER;
+    	
+        if(turn==0)
+	 {
+		int shark_pos=board_stepShark();
+		printf("Shark moved to %i\n", shark_pos);
+		//check die
+		checkDie();
+	 }  
+	 
 // ----- EX. 6 : game end ------------
     } while(game_end() == 0);
     
@@ -204,7 +251,36 @@ int main(int argc, const char * argv[]) {
     printf("GAME END!!\n");
     printf("%i players are alive! winner is %s\n", getAlivePlayer(), player_name[getWinner()]);
 // ----- EX. 6 : game end ------------
-    
+   
+	int getAlivePlayer(void)
+	{
+		int i;
+		int cnt = 0;
+		for (i=0; i<N_PLAYER; i++)
+		{
+			if (player_status[i] == PLAYERSTATUS_END)
+				cnt++;
+		}
+		return cnt;
+	}
+
+	int getWinner(void)
+	{
+		int i;
+		int winner = 0;
+		int max_coin = -1;
+
+		for (i=0; i<N_PLAYER; i++)
+		{
+			if (player_status[i] > max_coin)
+			max_coin=player_coin[i];
+			if (max_coin==player_coin[i])
+			
+				winner = i;
+			
+		}
+		return winner;	
+	}
 // ----- EX. 2 : structuring ------------
 
     return 0;

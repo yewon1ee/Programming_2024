@@ -53,7 +53,9 @@ int board_initBoard(void)
 // ----- EX. 5 : shark ------------
     shark_position = SHARK_INITPOS;
 // ----- EX. 5 : shark ------------
-
+if (shark_position < 0) {
+        shark_position = 0;
+    }
     //coin allocation
    
    for(i=0;i<N_COINPOS;i++) {
@@ -79,9 +81,20 @@ int board_initBoard(void)
 // ----- EX. 5 : shark ------------
 int board_stepShark(void)
 {
+    int step = rand() % MAX_SHARKSTEP + 1;
+    int i;
+    for (i=0; i <= shark_position + step; i++)
+    {
+        if (i >= 0 && i < N_BOARD)
+            board_status[i] = BOARDSTATUS_NOK;
+    }
 
+    shark_position += step;
+
+    return shark_position;
 }
 // ----- EX. 5 : shark ------------
+
 
 
 // ----- EX. 3 : board ------------
